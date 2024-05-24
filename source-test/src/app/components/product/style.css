@@ -1,0 +1,45 @@
+.region-tag {
+  position: absolute;
+  width: 70px;
+  height: 26px;
+  top: 10px;
+  left: -4px;
+  border-radius: 1px 2px 2px 1px;
+  background-color: #e6f5fa;
+  color: black;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2) !important;
+}
+
+.region-tag::before {
+  position: absolute;
+  width: 2px;
+  height: 14px;
+  top: 14px;
+  left: 0px;
+  content: "";
+  background-color: #e6f5fa;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+}
+
+.tag {
+  position: absolute;
+  top: 38px;
+  left: -4px;
+  width: 0;
+  height: 0;
+  border-right: 4px solid #e6f5fa;
+  border-left: 0px solid transparent;
+  border-bottom: 8px solid transparent;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.ant-input {
+  text-align: center;
+}
