@@ -48,6 +48,27 @@ export const useGetListProducts = (
   });
 };
 
+// export const useGetListItemBasket = (
+//   { search, pageSize, currentPage }: IProductReq,
+//   enabled?: boolean,
+//   options?: UseQueryOptions<IProductRes>
+// ) => {
+//   return useQuery({
+//     queryKey: ["products", search, pageSize, currentPage],
+//     queryFn: () =>
+//       handleGetProduct({
+//         search,
+//         pageSize,
+//         currentPage,
+//       }),
+//     staleTime: 20 * 1000,
+//     retry: 2,
+//     placeholderData: keepPreviousData,
+//     enabled: enabled,
+//     ...options,
+//   });
+// };
+
 export const useAddProductToBasket = () => {
   return useMutation({
     mutationFn: (body: IAddProductToBasketReq) => {
