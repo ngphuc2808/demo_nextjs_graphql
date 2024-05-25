@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Button } from "antd";
 import BasketContent from "@/app/components/basket";
 
 export const metadata: Metadata = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Col, Layout, Pagination, Row, Spin } from "antd";
 import type { PaginationProps } from "antd";
 
@@ -17,23 +17,27 @@ interface IProps {
 }
 
 const ProductContent = ({ basket }: IProps) => {
-  const { dataSearch } = useGlobalContext() as IGlobalContext;
+  const { dataSearch, setBasket } = useGlobalContext() as IGlobalContext;
 
   const [current, setCurrent] = useState<number>(1);
 
-  const { data, error, isLoading, isSuccess } = useGetListProducts({
+  const dataProduct = useGetListProducts({
     search: dataSearch,
-    pageSize: 10,
+    pageSize: 12,
     currentPage: current,
   });
 
   const hasMounted = useHasMounted();
 
+  useEffect(() => {
+    setBasket(basket);
+  }, [basket]);
+
   const onChange: PaginationProps["onChange"] = (page) => {
     setCurrent(page);
   };
 
-  if (error) return <h1>Something went wrong!</h1>;
+  if (dataProduct.error) return <h1>Something went wrong!</h1>;
   if (!hasMounted) return <></>;
 
   return (
@@ -42,14 +46,14 @@ const ProductContent = ({ basket }: IProps) => {
         <header>
           <h1 className="my-6 text-xl">List of products</h1>
         </header>
-        {isLoading ? (
+        {dataProduct.isLoading ? (
           <div className="w-full flex justify-center">
             <Spin />
           </div>
         ) : (
           <Row gutter={[16, 16]} className="max-h-[750px] overflow-y-auto">
-            {isSuccess &&
-              data?.products?.items.map((item) => (
+            {dataProduct.isSuccess &&
+              dataProduct.data?.products?.items.map((item) => (
                 <Col
                   key={item.uid}
                   xl={6}
@@ -68,7 +72,7 @@ const ProductContent = ({ basket }: IProps) => {
           </Row>
         )}
       </Content>
-      {isSuccess && data.products.total_count > 0 && (
+      {dataProduct.isSuccess && dataProduct.data?.products?.total_count > 0 && (
         <Pagination
           style={{
             marginTop: "24px",
@@ -76,7 +80,8 @@ const ProductContent = ({ basket }: IProps) => {
           className="flex items-center justify-center"
           current={current}
           onChange={onChange}
-          total={data.products.total_count}
+          pageSize={12}
+          total={dataProduct.data?.products?.total_count}
           showSizeChanger={false}
         />
       )}

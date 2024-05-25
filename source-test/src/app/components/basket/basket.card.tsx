@@ -1,38 +1,103 @@
-import { Checkbox, Col, Divider, Input, Row } from "antd";
-import React, { Fragment, useState } from "react";
+import { Col, Divider, Input, Row, message } from "antd";
 import { CloseCircleOutlined } from "@ant-design/icons";
+import Image from "next/image";
+import {
+  useRemoveProductFromBasket,
+  useUpdateProductToBasket,
+} from "@/app/utils/hooks/api.hook";
+import { useQueryClient } from "@tanstack/react-query";
 
-const BasketCard = () => {
-  const [select, setSelect] = useState<boolean>(false);
-  const [initValue, setInitValue] = useState<number>(1);
+interface IProps {
+  basket: string;
+  item: IItemsBasket;
+  lastItem?: boolean;
+}
+
+const BasketCard = ({ basket, item, lastItem }: IProps) => {
+  const queryClient = useQueryClient();
+
+  const updateProductToBasketApi = useUpdateProductToBasket();
+  const removeProductToBasketApi = useRemoveProductFromBasket();
+
+  const handleRemoveItemFromBasket = () => {
+    if (item.product.__typename === "SimpleProduct") {
+      removeProductToBasketApi.mutate(
+        {
+          removeItemFromCartInput: {
+            cart_id: basket,
+            cart_item_uid: item.uid,
+          },
+        },
+        {
+          onSuccess() {
+            message.success("Remove product to basket successfully!");
+            queryClient.invalidateQueries({ queryKey: ["basket"] });
+          },
+          onError() {
+            message.error("Remove product to basket failed!");
+          },
+        }
+      );
+    } else {
+      message.warning(
+        "This function is under development and will be updated later!"
+      );
+    }
+  };
+
+  const handleUpdateItemFromBasket = (quantity: number) => {
+    if (item.product.__typename === "SimpleProduct") {
+      updateProductToBasketApi.mutate(
+        {
+          input: {
+            cart_id: basket,
+            cart_items: [
+              {
+                cart_item_uid: item.uid,
+                quantity,
+              },
+            ],
+          },
+        },
+        {
+          onSuccess() {
+            message.success("Update product to basket successfully!");
+            queryClient.invalidateQueries({ queryKey: ["basket"] });
+          },
+          onError() {
+            message.error("Update product to basket failed!");
+          },
+        }
+      );
+    } else {
+      message.warning(
+        "This function is under development and will be updated later!"
+      );
+    }
+  };
 
   return (
-    <Fragment>
+    <>
       <Row align="middle" gutter={16}>
-        <Col span={1}>
-          <Checkbox
-            checked={select}
-            onChange={(e) => setSelect(e.target.checked)}
-          />
-        </Col>
+        <Col span={1}></Col>
         <Col span={3}>
-          <img
-            src={
-              "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-            }
+          <Image
+            width={65}
+            height={65}
+            src={item.product.thumbnail.url}
             alt={"product"}
-            style={{ width: "65px", height: "65px", objectFit: "cover" }}
+            style={{ objectFit: "cover" }}
           />
         </Col>
         <Col span={5}>
-          <h4>{"123"}</h4>
+          <h4>{item.product.name}</h4>
         </Col>
         <Col span={5}>
-          <p className="text-center">{"1000đ"}</p>
+          <p className="text-center">{item.prices.price.value}$</p>
         </Col>
         <Col span={3}>
           <Input
-            value={initValue}
+            value={item.quantity}
             min={1}
             type="number"
             onKeyPress={(event) => {
@@ -51,8 +116,10 @@ const BasketCard = () => {
                   cursor: "pointer",
                 }}
                 onClick={() => {
-                  if (initValue > 0) {
-                    setInitValue((prev) => prev - 1);
+                  if (item.quantity > 1) {
+                    handleUpdateItemFromBasket(item.quantity - 1);
+                  } else {
+                    handleRemoveItemFromBasket();
                   }
                 }}
               >
@@ -65,7 +132,7 @@ const BasketCard = () => {
                   cursor: "pointer",
                 }}
                 onClick={() => {
-                  setInitValue((prev) => prev + 1);
+                  handleUpdateItemFromBasket(item.quantity + 1);
                 }}
               >
                 +
@@ -78,20 +145,25 @@ const BasketCard = () => {
           />
         </Col>
         <Col span={5}>
-          <p className="text-center">{"1000đ"}</p>
+          <p className="text-center">{item.prices.row_total.value}$</p>
         </Col>
         <Col span={2}>
-          <span className="cursor-pointer hover:text-red-500 text-center block">
+          <span
+            className="cursor-pointer hover:text-red-500 text-center block"
+            onClick={handleRemoveItemFromBasket}
+          >
             <CloseCircleOutlined />
           </span>
         </Col>
       </Row>
-      <Divider
-        style={{
-          margin: "10px 0",
-        }}
-      />
-    </Fragment>
+      {!lastItem && (
+        <Divider
+          style={{
+            margin: "10px 0",
+          }}
+        />
+      )}
+    </>
   );
 };
 

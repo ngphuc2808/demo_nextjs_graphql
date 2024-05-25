@@ -11,7 +11,7 @@ const AppBody = () => {
     <div>
       {isFetching + isMutating !== 0 && (
         <div role="status" className="fixed bottom-10 right-10">
-          <Spin size="large" />
+          <Spin size="large" className="z-50" />
           <span className="sr-only">Loading...</span>
         </div>
       )}

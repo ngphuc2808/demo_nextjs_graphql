@@ -101,7 +101,29 @@ interface IAddProductToBasketRes {
   };
 }
 
-interface IGetBasketRes {
+interface IItemsBasket {
+  errors: null;
+  quantity: number;
+  uid: string;
+  product: IItems;
+  prices: {
+    discounts: null;
+    price: {
+      currency: string;
+      value: number;
+    };
+    row_total: {
+      currency: string;
+      value: number;
+    };
+    total_item_discount: {
+      currency: string;
+      value: number;
+    };
+  };
+}
+
+interface IBasketRes {
   cart: {
     id: string;
     is_virtual: boolean;
@@ -117,6 +139,6 @@ interface IGetBasketRes {
         value: number;
       };
     };
-    items: any[];
+    items: IItemsBasket[];
   };
 }

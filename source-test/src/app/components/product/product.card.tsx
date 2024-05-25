@@ -5,6 +5,7 @@ import "./style.css";
 import { useState } from "react";
 import Image from "next/image";
 import { useAddProductToBasket } from "@/app/utils/hooks/api.hook";
+import { useQueryClient } from "@tanstack/react-query";
 
 const { Meta } = Card;
 
@@ -14,6 +15,7 @@ interface IProps {
 }
 
 const CardItem = ({ item, basket }: IProps) => {
+  const queryClient = useQueryClient();
   const addProductToBasketApi = useAddProductToBasket();
 
   const [initValue, setInitValue] = useState<number>(1);
@@ -35,26 +37,32 @@ const CardItem = ({ item, basket }: IProps) => {
   const averageRating = totalRatings > 0 ? totalStars / totalRatings : 0;
 
   const handleAddToBasket = () => {
-    addProductToBasketApi.mutate(
-      {
-        cartId: basket,
-        cartItems: [
-          {
-            sku: item.sku,
-            quantity: initValue,
+    if (item.__typename === "SimpleProduct") {
+      addProductToBasketApi.mutate(
+        {
+          cartId: basket,
+          cartItems: [
+            {
+              sku: item.sku,
+              quantity: initValue,
+            },
+          ],
+        },
+        {
+          onSuccess() {
+            message.success("Add product to basket successfully!");
+            queryClient.invalidateQueries({ queryKey: ["basket"] });
           },
-        ],
-      },
-      {
-        onSuccess() {
-          message.success("Add product to basket successfully!");
-          // queryClient.invalidateQueries({ queryKey: ['UserInfo'] })
-        },
-        onError() {
-          message.error("Add product to basket failed!");
-        },
-      }
-    );
+          onError() {
+            message.error("Add product to basket failed!");
+          },
+        }
+      );
+    } else {
+      message.warning(
+        "This function is under development and will be updated later!"
+      );
+    }
   };
 
   return (
@@ -123,7 +131,11 @@ const CardItem = ({ item, basket }: IProps) => {
               />
             </Col>
             <Col span={12}>
-              <Button onClick={handleAddToBasket}>Add to basket</Button>
+              <Button onClick={handleAddToBasket}>
+                {item.__typename === "ConfigurableProduct"
+                  ? "See details"
+                  : "Add to basket"}
+              </Button>
             </Col>
           </Row>
           <span className="cursor-pointer px-4" onClick={() => setLike(!like)}>
