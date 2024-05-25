@@ -100,3 +100,23 @@ interface IAddProductToBasketRes {
       | any[];
   };
 }
+
+interface IGetBasketRes {
+  cart: {
+    id: string;
+    is_virtual: boolean;
+    total_quantity: number;
+    prices: {
+      discounts: any[];
+      grand_total: {
+        currency: string;
+        value: number;
+      };
+      subtotal_excluding_tax: {
+        currency: string;
+        value: number;
+      };
+    };
+    items: any[];
+  };
+}
